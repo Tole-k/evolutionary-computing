@@ -1,5 +1,6 @@
 use csv::ReaderBuilder;
 use rand::prelude::*;
+use std::cmp::Ordering;
 use std::f64;
 use std::str::FromStr;
 
@@ -9,6 +10,13 @@ pub struct DataPoint {
     pub x: i32,
     pub y: i32,
     pub cost: i32,
+}
+
+pub struct Metrics {
+    pub _scores: Vec<f64>,
+    pub min: f64,
+    pub max: f64,
+    pub avg: f64,
 }
 
 pub fn calculate_distance(a: DataPoint, b: DataPoint) -> f64 {
@@ -51,4 +59,40 @@ pub fn generate_random_solution(size: usize) -> Vec<usize> {
     nums.shuffle(&mut rng);
     let half_nums = &nums.clone()[..size / 2];
     half_nums.to_vec()
+}
+
+pub fn benchmark_function(
+    f: fn(Vec<DataPoint>, usize) -> Vec<usize>,
+    data: Vec<DataPoint>,
+) -> Metrics {
+    let mut scores: Vec<f64> = vec![];
+    for i in 0..200 {
+        let solution = f(data.clone(), i);
+        scores.push(check_solution(solution, data.clone()));
+    }
+
+    let min = scores.iter().fold(f64::INFINITY, |a, &b| {
+        match PartialOrd::partial_cmp(&a, &b) {
+            None => f64::NAN,
+            Some(Ordering::Less) => a,
+            Some(_) => b,
+        }
+    });
+    let max = scores.iter().fold(-f64::INFINITY, |a, &b| {
+        match PartialOrd::partial_cmp(&a, &b) {
+            None => f64::NAN,
+            Some(Ordering::Greater) => a,
+            Some(_) => b,
+        }
+    });
+    let sum: f64 = scores.iter().sum();
+    let avg: f64 = sum / scores.len() as f64;
+
+    // let minValue = *scores.iter().min().unwrap();
+    Metrics {
+        _scores: scores,
+        min,
+        max,
+        avg,
+    }
 }

@@ -49,6 +49,10 @@ pub fn greedy_nn_to_cycle(data: Vec<DataPoint>, starting_point_id: usize) -> Vec
                 closest_point = point;
             }
         }
+        // TODO: Currently algorithm adds to the end the point that is the closest to any of points in cycle.
+        // This is highly sub-optimal and I'm not sure if it's how this algorithm is meant to be.
+        // We could find the closest point in the graph to it, and put it this way
+        // but then what is the difference between this and greedy cycle algorithm?
 
         tsp_path.push(closest_point.id);
 
