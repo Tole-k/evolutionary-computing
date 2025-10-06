@@ -5,9 +5,14 @@ use std::str::FromStr;
 
 #[derive(Copy, Clone)]
 pub struct DataPoint {
+    pub id: usize,
     pub x: i32,
     pub y: i32,
     pub cost: i32,
+}
+
+pub fn calculate_distance(a: DataPoint, b: DataPoint) -> f64 {
+    (((a.x - b.x).pow(2) + (a.y - b.y).pow(2)) as f64).sqrt() + b.cost as f64
 }
 
 pub fn load_data(path: &str) -> Vec<DataPoint> {
@@ -17,12 +22,12 @@ pub fn load_data(path: &str) -> Vec<DataPoint> {
         .from_path(path);
     let mut records_mut: Vec<DataPoint> = vec![];
 
-    for record in reader.unwrap().records() {
+    for (id, record) in reader.unwrap().records().enumerate() {
         let uwrapped_record = record.unwrap();
         let x: i32 = FromStr::from_str(uwrapped_record.get(0).unwrap()).unwrap();
         let y: i32 = FromStr::from_str(uwrapped_record.get(1).unwrap()).unwrap();
         let cost: i32 = FromStr::from_str(uwrapped_record.get(2).unwrap()).unwrap();
-        records_mut.push(DataPoint { x, y, cost });
+        records_mut.push(DataPoint { id, x, y, cost });
     }
     records_mut
 }
@@ -33,16 +38,10 @@ pub fn check_solution(solution: Vec<usize>, data: Vec<DataPoint>) -> f64 {
     let mut last_point = first_point;
     for index in 1..solution.len() {
         let current_point = data[solution[index]];
-        total_value += (((current_point.x - last_point.x).pow(2)
-            + (current_point.y - last_point.y).pow(2)) as f64)
-            .sqrt();
-        total_value += current_point.cost as f64;
+        total_value += calculate_distance(last_point, current_point);
         last_point = current_point;
     }
-    total_value += (((first_point.x - last_point.x).pow(2) + (first_point.y - last_point.y).pow(2))
-        as f64)
-        .sqrt();
-    total_value += first_point.cost as f64;
+    total_value += calculate_distance(last_point, first_point);
     total_value
 }
 
