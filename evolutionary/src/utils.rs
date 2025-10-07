@@ -98,7 +98,6 @@ pub fn benchmark_function(
     let sum: f64 = scores.iter().sum();
     let avg: f64 = sum / scores.len() as f64;
 
-    // let minValue = *scores.iter().min().unwrap();
     Metrics {
         _scores: scores,
         min,

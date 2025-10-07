@@ -83,12 +83,18 @@ pub fn main() {
         "NN to last point (min: {}, avg: {}, max: {})",
         metric_nn_tlp.min, metric_nn_tlp.avg, metric_nn_tlp.max,
     );
-    utils::save_solution(metric_nn_tlp.best_solution, "greedy_nn_to_last_point.csv");
+    utils::save_solution(
+        metric_nn_tlp.best_solution,
+        "../reports/report1/greedy_nn_to_last_point.csv",
+    );
 
     let metric_nn_tc = utils::benchmark_function(greedy_nn_to_cycle, data.clone());
     println!(
         "NN to cycle (min: {}, avg: {}, max: {})",
         metric_nn_tc.min, metric_nn_tc.avg, metric_nn_tc.max,
     );
-    utils::save_solution(metric_nn_tc.best_solution, "greedy_nn_to_cycle.csv");
+    utils::save_solution(
+        metric_nn_tc.best_solution,
+        "../reports/report1/greedy_nn_to_cycle.csv",
+    );
 }
