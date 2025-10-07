@@ -23,8 +23,8 @@ pub struct Metrics {
     pub best_solution: Vec<usize>,
 }
 
-pub fn calculate_distance_matrix(records: Vec<DataPoint>) -> Array2<f64> {
-    let records = Array1::from_vec(records);
+pub fn calculate_distance_matrix(records: &Vec<DataPoint>) -> Array2<f64> {
+    let records = Array1::from_vec(records.clone());
     let x = records.map(|s| s.x as f64);
     let y = records.map(|s| s.y as f64);
     let cost = records.map(|s| s.cost as f64);
@@ -52,7 +52,7 @@ pub fn load_data(path: &str) -> Vec<DataPoint> {
     records_mut
 }
 
-pub fn check_solution(solution: Vec<usize>, data: Vec<DataPoint>, distance_matrix: &Array2<f64>) -> f64 {
+pub fn check_solution(solution: &Vec<usize>, data: &Vec<DataPoint>, distance_matrix: &Array2<f64>) -> f64 {
     let mut total_value = 0.0;
     let first_point = data[solution[0]];
     let mut last_point = first_point;
@@ -69,21 +69,21 @@ pub fn generate_random_solution(size: usize) -> Vec<usize> {
     let mut nums: Vec<usize> = (0..size).collect();
     let mut rng = rand::rng();
     nums.shuffle(&mut rng);
-    let half_nums = &nums.clone()[..size / 2];
+    let half_nums = &nums[..size / 2];
     half_nums.to_vec()
 }
 
 pub fn benchmark_function(
-    f: fn(Vec<DataPoint>, usize, &Array2<f64>) -> Vec<usize>,
-    data: Vec<DataPoint>,
+    f: fn(&Vec<DataPoint>, usize, &Array2<f64>) -> Vec<usize>,
+    data: &Vec<DataPoint>,
     distance_matrix: &Array2<f64>
 ) -> Metrics {
     let mut scores: Vec<f64> = vec![];
     let mut best_solution_score: f64 = f64::INFINITY;
     let mut best_solution: Vec<usize> = vec![];
     for i in 0..data.len() {
-        let solution = f(data.clone(), i, distance_matrix);
-        let solution_score = check_solution(solution.clone(), data.clone(), distance_matrix);
+        let solution = f(data, i, distance_matrix);
+        let solution_score = check_solution(&solution, data, distance_matrix);
         scores.push(solution_score);
         if solution_score < best_solution_score {
             best_solution_score = solution_score;

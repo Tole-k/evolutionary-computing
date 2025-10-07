@@ -5,7 +5,7 @@ use crate::utils::DataPoint;
 
 fn find_closest(
     point_id: usize,
-    data: Vec<DataPoint>,
+    data: &Vec<DataPoint>,
     distance_matrix: &Array2<f64>,
 ) -> (usize, f64) {
     let mut closest_distance: f64 = f64::INFINITY;
@@ -23,7 +23,7 @@ fn find_closest(
 fn find_cheapest_extension(
     point_a_id: usize,
     point_b_id: usize,
-    data: Vec<DataPoint>,
+    data: &Vec<DataPoint>,
     distance_matrix: &Array2<f64>,
 ) -> (usize, f64) {
     let mut closest_distance: f64 = f64::INFINITY;
@@ -41,7 +41,7 @@ fn find_cheapest_extension(
 }
 
 fn greedy_nn_to_last_point(
-    data: Vec<DataPoint>,
+    data: &Vec<DataPoint>,
     starting_point_id: usize,
     distance_matrix: &Array2<f64>,
 ) -> Vec<usize> {
@@ -50,7 +50,7 @@ fn greedy_nn_to_last_point(
     let mut not_visited_points: Vec<DataPoint> = data.clone();
     for _ in 1..data.len() / 2 {
         let (closest_point_id, _) =
-            find_closest(last_point_id, not_visited_points.clone(), distance_matrix);
+            find_closest(last_point_id, &not_visited_points, distance_matrix);
         tsp_path.push(closest_point_id);
         let index = not_visited_points
             .iter()
@@ -63,7 +63,7 @@ fn greedy_nn_to_last_point(
 }
 
 fn greedy_nn_to_cycle(
-    data: Vec<DataPoint>,
+    data: &Vec<DataPoint>,
     starting_point_id: usize,
     distance_matrix: &Array2<f64>,
 ) -> Vec<usize> {
@@ -74,13 +74,13 @@ fn greedy_nn_to_cycle(
     for _ in 1..data.len() / 2 {
         let mut insert_spot: usize = 0;
         let (mut closest_point_id, mut closest_distance) =
-            find_closest(tsp_path[0], not_visited_points.clone(), distance_matrix);
-        for (i, pair) in tsp_path.clone().windows(2).enumerate() {
+            find_closest(tsp_path[0], &not_visited_points, distance_matrix);
+        for (i, pair) in tsp_path.windows(2).enumerate() {
             let (a, b) = (pair[0], pair[1]);
             let distance: f64;
             let point_id: usize;
             (point_id, distance) =
-                find_cheapest_extension(a, b, not_visited_points.clone(), distance_matrix);
+                find_cheapest_extension(a, b, &not_visited_points, distance_matrix);
             if distance < closest_distance {
                 closest_distance = distance;
                 insert_spot = i + 1;
@@ -89,7 +89,7 @@ fn greedy_nn_to_cycle(
         }
         let (point_id, distance) = find_closest(
             tsp_path[tsp_path.len() - 1],
-            not_visited_points.clone(),
+            &not_visited_points,
             distance_matrix,
         );
         if distance < closest_distance {
@@ -108,7 +108,7 @@ fn greedy_nn_to_cycle(
 }
 
 fn greedy_cycle(
-    data: Vec<DataPoint>,
+    data: &Vec<DataPoint>,
     starting_point_id: usize,
     distance_matrix: &Array2<f64>,
 ) -> Vec<usize> {
@@ -120,12 +120,12 @@ fn greedy_cycle(
         let mut insert_spot: usize = 0;
         let mut closest_point_id = starting_point_id;
         let mut closest_distance = f64::INFINITY;
-        for (i, pair) in tsp_path.clone().windows(2).enumerate() {
+        for (i, pair) in tsp_path.windows(2).enumerate() {
             let (a, b) = (pair[0], pair[1]);
             let distance: f64;
             let point_id: usize;
             (point_id, distance) =
-                find_cheapest_extension(a, b, not_visited_points.clone(), distance_matrix);
+                find_cheapest_extension(a, b, &not_visited_points, distance_matrix);
             if distance < closest_distance {
                 closest_distance = distance;
                 insert_spot = i + 1;
@@ -137,7 +137,7 @@ fn greedy_cycle(
         let distance: f64;
         let point_id: usize;
         (point_id, distance) =
-            find_cheapest_extension(a, b, not_visited_points.clone(), distance_matrix);
+            find_cheapest_extension(a, b, &not_visited_points, distance_matrix);
         if distance < closest_distance {
             closest_point_id = point_id;
             tsp_path.push(closest_point_id);
@@ -155,13 +155,13 @@ fn greedy_cycle(
 
 pub fn main() {
     let data: Vec<DataPoint> = utils::load_data("../data/TSPB.csv");
-    let distance_matrix = utils::calculate_distance_matrix(data.clone());
+    let distance_matrix = utils::calculate_distance_matrix(&data);
     let random_solution = utils::generate_random_solution(data.len());
-    let total_score = utils::check_solution(random_solution, data.clone(), &distance_matrix);
+    let total_score = utils::check_solution(&random_solution, &data, &distance_matrix);
     println!("Total cost from random solution: {total_score:.1}");
 
     let metric_nn_tlp =
-        utils::benchmark_function(greedy_nn_to_last_point, data.clone(), &distance_matrix);
+        utils::benchmark_function(greedy_nn_to_last_point, &data, &distance_matrix);
     println!(
         "NN to last point (min: {}, avg: {}, max: {})",
         metric_nn_tlp.min, metric_nn_tlp.avg, metric_nn_tlp.max,
@@ -172,7 +172,7 @@ pub fn main() {
     );
 
     let metric_nn_tc =
-        utils::benchmark_function(greedy_nn_to_cycle, data.clone(), &distance_matrix);
+        utils::benchmark_function(greedy_nn_to_cycle, &data, &distance_matrix);
     println!(
         "NN to cycle (min: {}, avg: {}, max: {})",
         metric_nn_tc.min, metric_nn_tc.avg, metric_nn_tc.max,
@@ -182,7 +182,7 @@ pub fn main() {
         "../reports/report1/greedy_nn_to_cycle.csv",
     );
         let metric_greedy_cycle =
-        utils::benchmark_function(greedy_cycle, data.clone(), &distance_matrix);
+        utils::benchmark_function(greedy_cycle, &data, &distance_matrix);
     println!(
         "Greedy cycle (min: {}, avg: {}, max: {})",
         metric_greedy_cycle.min, metric_greedy_cycle.avg, metric_greedy_cycle.max,
