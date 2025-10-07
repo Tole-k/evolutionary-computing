@@ -1,7 +1,7 @@
+use core::f64;
 use csv::ReaderBuilder;
 use rand::prelude::*;
 use std::cmp::Ordering;
-use std::f64;
 use std::fs::File;
 use std::io::Write;
 use std::str::FromStr;
@@ -19,6 +19,7 @@ pub struct Metrics {
     pub min: f64,
     pub max: f64,
     pub avg: f64,
+    pub best_solution: Vec<usize>,
 }
 
 pub fn calculate_distance(a: DataPoint, b: DataPoint) -> f64 {
@@ -68,9 +69,16 @@ pub fn benchmark_function(
     data: Vec<DataPoint>,
 ) -> Metrics {
     let mut scores: Vec<f64> = vec![];
-    for i in 0..200 {
+    let mut best_solution_score: f64 = f64::INFINITY;
+    let mut best_solution: Vec<usize> = vec![];
+    for i in 0..data.len() {
         let solution = f(data.clone(), i);
-        scores.push(check_solution(solution, data.clone()));
+        let solution_score = check_solution(solution.clone(), data.clone());
+        scores.push(solution_score);
+        if solution_score < best_solution_score {
+            best_solution_score = solution_score;
+            best_solution = solution;
+        }
     }
 
     let min = scores.iter().fold(f64::INFINITY, |a, &b| {
@@ -96,6 +104,7 @@ pub fn benchmark_function(
         min,
         max,
         avg,
+        best_solution,
     }
 }
 

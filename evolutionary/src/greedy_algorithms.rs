@@ -1,3 +1,4 @@
+use crate::utils;
 use crate::utils::{DataPoint, calculate_distance};
 
 fn find_closest(point: DataPoint, data: Vec<DataPoint>) -> (DataPoint, f64) {
@@ -13,7 +14,7 @@ fn find_closest(point: DataPoint, data: Vec<DataPoint>) -> (DataPoint, f64) {
     (closest_point, closest_distance)
 }
 
-pub fn greedy_nn_to_last_point(data: Vec<DataPoint>, starting_point_id: usize) -> Vec<usize> {
+fn greedy_nn_to_last_point(data: Vec<DataPoint>, starting_point_id: usize) -> Vec<usize> {
     let starting_point = data[starting_point_id];
     let mut last_point = starting_point;
     let mut tsp_path: Vec<usize> = vec![];
@@ -31,7 +32,7 @@ pub fn greedy_nn_to_last_point(data: Vec<DataPoint>, starting_point_id: usize) -
     tsp_path
 }
 
-pub fn greedy_nn_to_cycle(data: Vec<DataPoint>, starting_point_id: usize) -> Vec<usize> {
+fn greedy_nn_to_cycle(data: Vec<DataPoint>, starting_point_id: usize) -> Vec<usize> {
     let starting_point = data[starting_point_id];
     let mut tsp_path: Vec<usize> = vec![];
     let mut not_visited_points: Vec<DataPoint> = data.clone();
@@ -65,8 +66,29 @@ pub fn greedy_nn_to_cycle(data: Vec<DataPoint>, starting_point_id: usize) -> Vec
     tsp_path
 }
 
-pub fn greedy_cycle(data: Vec<DataPoint>, starting_point: usize) -> Vec<usize> {
+fn greedy_cycle(data: Vec<DataPoint>, starting_point: usize) -> Vec<usize> {
     // TODO: Implement
     (_, _) = (data, starting_point);
     vec![1, 2]
+}
+
+pub fn main() {
+    let data: Vec<DataPoint> = utils::load_data("../data/TSPB.csv");
+    let random_solution = utils::generate_random_solution(200);
+    let total_score = utils::check_solution(random_solution, data.clone());
+    println!("Total cost from random solution: {total_score:.1}");
+
+    let metric_nn_tlp = utils::benchmark_function(greedy_nn_to_last_point, data.clone());
+    println!(
+        "NN to last point (min: {}, avg: {}, max: {})",
+        metric_nn_tlp.min, metric_nn_tlp.avg, metric_nn_tlp.max,
+    );
+    utils::save_solution(metric_nn_tlp.best_solution, "greedy_nn_to_last_point.csv");
+
+    let metric_nn_tc = utils::benchmark_function(greedy_nn_to_cycle, data.clone());
+    println!(
+        "NN to cycle (min: {}, avg: {}, max: {})",
+        metric_nn_tc.min, metric_nn_tc.avg, metric_nn_tc.max,
+    );
+    utils::save_solution(metric_nn_tc.best_solution, "greedy_nn_to_cycle.csv");
 }
