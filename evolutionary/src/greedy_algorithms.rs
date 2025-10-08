@@ -42,10 +42,10 @@ fn find_cheapest_extension(
 
 fn greedy_nn_to_last_point(
     data: &Vec<DataPoint>,
-    starting_point_id: usize,
+    starting_point_index: usize,
     distance_matrix: &Array2<f64>,
 ) -> Vec<usize> {
-    let mut last_point_id = starting_point_id;
+    let mut last_point_id = data[starting_point_index].id;
     let mut tsp_path: Vec<usize> = vec![];
     let mut not_visited_points: Vec<DataPoint> = data.clone();
     for _ in 1..data.len() / 2 {
@@ -64,13 +64,14 @@ fn greedy_nn_to_last_point(
 
 fn greedy_nn_to_cycle(
     data: &Vec<DataPoint>,
-    starting_point_id: usize,
+    starting_point_index: usize,
     distance_matrix: &Array2<f64>,
 ) -> Vec<usize> {
+    let starting_point_id = data[starting_point_index].id;
     let mut tsp_path: Vec<usize> = vec![];
     let mut not_visited_points: Vec<DataPoint> = data.clone();
     tsp_path.push(starting_point_id);
-    not_visited_points.remove(starting_point_id);
+    not_visited_points.remove(starting_point_index);
     for _ in 1..data.len() / 2 {
         let mut insert_spot: usize = 0;
         let (mut closest_point_id, mut closest_distance) =
@@ -109,13 +110,14 @@ fn greedy_nn_to_cycle(
 
 fn greedy_cycle(
     data: &Vec<DataPoint>,
-    starting_point_id: usize,
+    starting_point_index: usize,
     distance_matrix: &Array2<f64>,
 ) -> Vec<usize> {
+    let starting_point_id = data[starting_point_index].id;
     let mut tsp_path: Vec<usize> = vec![];
     let mut not_visited_points: Vec<DataPoint> = data.clone();
     tsp_path.push(starting_point_id);
-    not_visited_points.remove(starting_point_id);
+    not_visited_points.remove(starting_point_index);
     for _ in 1..data.len() / 2 {
         let mut insert_spot: usize = 0;
         let mut closest_point_id = starting_point_id;
