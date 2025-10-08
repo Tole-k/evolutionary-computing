@@ -65,7 +65,12 @@ pub fn check_solution(solution: &Vec<usize>, data: &Vec<DataPoint>, distance_mat
     total_value
 }
 
-pub fn generate_random_solution(size: usize) -> Vec<usize> {
+pub fn generate_random_solution(
+    data: &Vec<DataPoint>,
+    _starting_point_index: usize,
+    _distance_matrix: &Array2<f64>,
+) -> Vec<usize> {
+    let size = data.len();
     let mut nums: Vec<usize> = (0..size).collect();
     let mut rng = rand::rng();
     nums.shuffle(&mut rng);

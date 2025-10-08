@@ -158,9 +158,17 @@ fn greedy_cycle(
 pub fn main() {
     let data: Vec<DataPoint> = utils::load_data("../data/TSPB.csv");
     let distance_matrix = utils::calculate_distance_matrix(&data);
-    let random_solution = utils::generate_random_solution(data.len());
-    let total_score = utils::check_solution(&random_solution, &data, &distance_matrix);
-    println!("Total cost from random solution: {total_score:.1}");
+
+    let metric_nn_random =
+        utils::benchmark_function(utils::generate_random_solution, &data, &distance_matrix);
+    println!(
+        "Random (min: {}, avg: {}, max: {})",
+        metric_nn_random.min, metric_nn_random.avg, metric_nn_random.max,
+    );
+    utils::save_solution(
+        metric_nn_random.best_solution,
+        "../reports/report1/random.csv",
+    );
 
     let metric_nn_tlp =
         utils::benchmark_function(greedy_nn_to_last_point, &data, &distance_matrix);
