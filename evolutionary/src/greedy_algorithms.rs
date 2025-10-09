@@ -155,50 +155,37 @@ fn greedy_cycle(
     tsp_path
 }
 
+
+
 pub fn main() {
     let data: Vec<DataPoint> = utils::load_data("../data/TSPB.csv");
     let distance_matrix = utils::calculate_distance_matrix(&data);
-
-    let metric_nn_random =
-        utils::benchmark_function(utils::generate_random_solution, &data, &distance_matrix);
-    println!(
-        "Random (min: {}, avg: {}, max: {})",
-        metric_nn_random.min, metric_nn_random.avg, metric_nn_random.max,
-    );
-    utils::save_solution(
-        metric_nn_random.best_solution,
-        "../reports/report1/random.csv",
-    );
-
-    let metric_nn_tlp =
-        utils::benchmark_function(greedy_nn_to_last_point, &data, &distance_matrix);
-    println!(
-        "NN to last point (min: {}, avg: {}, max: {})",
-        metric_nn_tlp.min, metric_nn_tlp.avg, metric_nn_tlp.max,
-    );
-    utils::save_solution(
-        metric_nn_tlp.best_solution,
-        "../reports/report1/greedy_nn_to_last_point.csv",
-    );
-
-    let metric_nn_tc =
-        utils::benchmark_function(greedy_nn_to_cycle, &data, &distance_matrix);
-    println!(
-        "NN to cycle (min: {}, avg: {}, max: {})",
-        metric_nn_tc.min, metric_nn_tc.avg, metric_nn_tc.max,
-    );
-    utils::save_solution(
-        metric_nn_tc.best_solution,
-        "../reports/report1/greedy_nn_to_cycle.csv",
-    );
-        let metric_greedy_cycle =
-        utils::benchmark_function(greedy_cycle, &data, &distance_matrix);
-    println!(
-        "Greedy cycle (min: {}, avg: {}, max: {})",
-        metric_greedy_cycle.min, metric_greedy_cycle.avg, metric_greedy_cycle.max,
-    );
-    utils::save_solution(
-        metric_greedy_cycle.best_solution,
-        "../reports/report1/greedy_cycle.csv",
-    );
+    let algorithm = std::env::args().nth(1).expect("please specify algorithm");
+    let algorithm = algorithm.as_str();
+    let full_suite = |name:&str,f: fn(&Vec<DataPoint>, usize, &Array2<f64>) -> Vec<usize>|
+    {
+        let metric =
+        utils::benchmark_function(f, &data, &distance_matrix);
+        println!(
+        "{name} (min: {}, avg: {}, max: {})",
+        metric.min, metric.avg, metric.max,
+        );
+        utils::save_solution(
+            metric.best_solution,
+        format!("../reports/report1/{name}.csv").as_str(),
+        );
+    };
+    match algorithm {
+        "random" => full_suite("random",utils::generate_random_solution),
+        "nn-to-last-point" => full_suite("nn_to_last_point",greedy_nn_to_last_point),
+        "nn-to-cycle" => full_suite("nn_to_cycle", greedy_nn_to_cycle),
+        "greedy-cycle" => full_suite("greedy_cycle", greedy_cycle),
+        "all" => {
+            full_suite("random",utils::generate_random_solution);
+            full_suite("nn_to_last point",greedy_nn_to_last_point);
+            full_suite("nn_to_cycle",greedy_nn_to_cycle);
+            full_suite("greedy_cycle",greedy_cycle);
+        }
+        _ => println!("Invalid algorithm")
+    }
 }
