@@ -172,14 +172,23 @@ struct Args {
     /// Index of staring point
     #[arg(short, long, default_value_t=1)]
     starting_point: usize,
+
+    ///number of nodes, -1 for all nodes from file
+    #[arg(short, long, default_value_t=-1)]
+    num_nodes:i32,
 }
 
 pub fn main() {
-    let data: Vec<DataPoint> = utils::load_data("../data/TSPB.csv");
-    let distance_matrix = utils::calculate_distance_matrix(&data);
     let args = Args::parse();
     let mode = args.mode;
     let algorithm = args.algorithm.as_str();
+    let nodes_subset = args.num_nodes;
+    let mut data: Vec<DataPoint> = utils::load_data("../data/TSPB.csv");
+    if nodes_subset != -1{
+        let nodes_subset = nodes_subset as usize;
+        data = data[..nodes_subset].to_vec();
+    }
+    let distance_matrix = utils::calculate_distance_matrix(&data);
     let benchmark_suite = |name:&str,f: fn(&Vec<DataPoint>, usize, &Array2<f64>) -> Vec<usize>|
     {
         let now = Instant::now();
