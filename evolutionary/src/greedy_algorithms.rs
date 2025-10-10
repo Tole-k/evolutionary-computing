@@ -182,7 +182,7 @@ pub fn main() {
         "greedy-cycle" => full_suite("greedy_cycle", greedy_cycle),
         "all" => {
             full_suite("random",utils::generate_random_solution);
-            full_suite("nn_to_last point",greedy_nn_to_last_point);
+            full_suite("nn_to_last_point",greedy_nn_to_last_point);
             full_suite("nn_to_cycle",greedy_nn_to_cycle);
             full_suite("greedy_cycle",greedy_cycle);
         }
