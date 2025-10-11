@@ -43,7 +43,7 @@ fn find_cheapest_extension(
     (closest_point, closest_distance)
 }
 
-fn greedy_nn_to_last_point(
+pub fn greedy_nn_to_last_point(
     data: &Vec<DataPoint>,
     starting_point_index: usize,
     distance_matrix: &Array2<f64>,
@@ -66,7 +66,7 @@ fn greedy_nn_to_last_point(
     tsp_path
 }
 
-fn greedy_nn_to_cycle(
+pub fn greedy_nn_to_cycle(
     data: &Vec<DataPoint>,
     starting_point_index: usize,
     distance_matrix: &Array2<f64>,
@@ -111,7 +111,7 @@ fn greedy_nn_to_cycle(
     tsp_path
 }
 
-fn greedy_cycle(
+pub fn greedy_cycle(
     data: &Vec<DataPoint>,
     starting_point_index: usize,
     distance_matrix: &Array2<f64>,
@@ -192,11 +192,7 @@ pub fn main() {
     {
         let now = Instant::now();
         let metric =
-        utils::benchmark_function(f, &data, &distance_matrix);
-        println!(
-        "{name} (min: {}, avg: {}, max: {})",
-        metric.min, metric.avg, metric.max,
-        );
+        utils::benchmark_function(f, &data, &distance_matrix, name);
         utils::save_solution(
             metric.best_solution,
         format!("../reports/report1/{name}.csv").as_str(),

@@ -564,6 +564,7 @@ dependencies = [
  "ndarray",
  "pyo3",
  "rand",
+ "serde",
  "serde_json",
 ]
 

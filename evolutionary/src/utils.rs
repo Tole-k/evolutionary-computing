@@ -6,9 +6,8 @@ use std::io::Write;
 use std::str::FromStr;
 use ndarray::{Array1, Array2, Axis};
 use std::time::Instant;
-use serde_json::Value;
 
-#[derive(Copy, Clone)]
+#[derive(Copy, Clone, )]
 pub struct DataPoint {
     pub id: usize,
     pub x: i32,
@@ -120,7 +119,11 @@ pub fn run_benchmark_suite(
         let (function, name) = iter_tuple;
         results.push(benchmark_function(*function, data, distance_matrix, name));
     }
+    // let list_as_json = serde_json::to_string(&results).unwrap();
+    // let mut file = File::create("result.json").expect("Could not create file!");
 
+    // file.write_all(list_as_json.as_bytes())
+    //     .expect("Cannot write to the file!");
 }
 
 pub fn save_solution(solution: Vec<usize>, path: &str) {
