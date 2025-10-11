@@ -32,7 +32,7 @@ pub fn calculate_distance_matrix(records: &Vec<DataPoint>) -> Array2<f64> {
     let b_x = &x.insert_axis(Axis(0));
     let a_y = &y.clone().insert_axis(Axis(1));
     let b_y = &y.insert_axis(Axis(0));
-    ((a_x - b_x).pow2() + (a_y - b_y).pow2()).sqrt() + cost
+    (((a_x - b_x).pow2() + (a_y - b_y).pow2()).sqrt()).round() + cost
 }
 
 pub fn load_data(path: &str) -> Vec<DataPoint> {
